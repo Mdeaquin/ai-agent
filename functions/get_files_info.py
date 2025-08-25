@@ -1,4 +1,5 @@
 import os
+import config
 
 def get_files_info(working_directory, directory="."):
     abs_working_dir = os.path.normpath(os.path.abspath(working_directory))
@@ -26,3 +27,17 @@ def get_files_info(working_directory, directory="."):
             return "\n".join(file_lines)
         except Exception as e:
             return f"    Error: An unexpected error occurred: {e}"
+
+def get_file_content(working_directory, file_path):
+    abs_working_dir = os.path.normpath(os.path.abspath(working_directory))
+    path_to_check = os.path.normpath(os.path.abspath(os.path.join(working_directory, file_path)))
+    if path_to_check.startswith(abs_working_dir) is False:
+        return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
+    if not os.path.isfile(path_to_check):
+        return f'Error: File not found or is not a regular file: "{file_path}"'
+    try:
+        with open(path_to_check, "r", encoding="utf-8") as f:
+            file_content_string = f.read(config.MAX_CHARS)
+            return file_content_string
+    except Exception as e:
+        return f'    Error: unexpected error: "{e}"'
