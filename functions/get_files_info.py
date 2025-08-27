@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 import config
 
 def get_files_info(working_directory, directory="."):
@@ -41,3 +42,31 @@ def get_file_content(working_directory, file_path):
             return file_content_string
     except Exception as e:
         return f'    Error: unexpected error: "{e}"'
+
+schema_get_files_info = types.FunctionDeclaration(
+    name="get_files_info",
+    description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+            ),
+        },
+    ),
+)
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Reads the file and at a specified file path and returns the contents of the file",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file path to read the file contents provided it exists and is a regular file"
+            ),
+        },
+    ),
+)
