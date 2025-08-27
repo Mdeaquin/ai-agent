@@ -18,7 +18,7 @@ def get_files_info(working_directory, directory="."):
                 path_to_file = os.path.join(path_to_check, file)
                 if os.path.isdir(path_to_file) is True:
                     is_dir = True
-                    file_size = 92
+                    file_size = 0
                 else:
                     is_dir = False
                     file_size = os.path.getsize(path_to_file)

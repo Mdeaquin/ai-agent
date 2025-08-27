@@ -37,6 +37,7 @@ def run_python_file(working_directory, file_path, args=[]):
     except Exception as e:
         return f"Error: executing Python file: {e}"
 
+
 schema_run_python_file = types.FunctionDeclaration(
     name="run_python_file",
     description="Runs a python program",
@@ -48,8 +49,9 @@ schema_run_python_file = types.FunctionDeclaration(
                 description="The file path of the python program to run, as long as it exists within the working directory, and is a python file"
             ),
             "args": types.Schema(
-                type=types.Type.STRING ,
-                description="Arguements to be specified when running the python program"
+                type=types.Type.ARRAY,
+                items=types.Schema(type=types.Type.STRING),
+                description="Arguments to pass to the Python program"
             ),
         },
     ),
