@@ -37,8 +37,21 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
-    generate_content(client, messages, verbose)
+    try:
+        iterations = 0
+        while True:
+            iterations += 1
+            if iterations > 20:
+                print("Too many iterations")
+                break
 
+            result = generate_content(client, messages, verbose)
+
+            if result:
+                print("Final response:", result)
+                break
+    except RuntimeError as e:
+        return(f"Error: {e}")
 
 def generate_content(client, messages, verbose):
     model_name = "gemini-2.0-flash-001"
@@ -47,21 +60,29 @@ def generate_content(client, messages, verbose):
         contents=messages,
         config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt),
     )
+    if response.candidates:
+        for candidate in response.candidates:
+            function_call_content = candidate.content
+            messages.append(function_call_content)
+
     if verbose is True:
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
     if not response.function_calls:
-        print("Response:")
-        print(response.text)
-        return
+        return response.text
+    
+    function_responses = []
     for function_call in response.function_calls:
         function_call_result = call_function(function_call, verbose)
         fr = function_call_result.parts[0].function_response.response
         if fr is None:
             raise RuntimeError("Function call returned no response")
+        function_responses.append(function_call_result.parts[0])
+
         if verbose:
             print(f"-> {fr}")
+    messages.append(types.Content(role="user", parts=function_responses))
 
 def call_function(function_call_part, verbose=False):
     function_name = function_call_part.name
