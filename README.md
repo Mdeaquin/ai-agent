@@ -1,0 +1,1 @@
+AI-Agent project created as follow up to boot.dev Python: Functional Programming course.
